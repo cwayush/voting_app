@@ -1,5 +1,6 @@
 const mongoose = require('mongoose')
 
+// Design Candidate Schema:
 const candidateSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -13,6 +14,8 @@ const candidateSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+
+    // this array store the voted userID so can count the live vote:
     votes: [
         {
             user: {
@@ -31,3 +34,7 @@ const candidateSchema = new mongoose.Schema({
         default: 0
     }
 })
+
+// Convert the candidate Schema into 'model' by mongoose and export the model:
+const candidate = mongoose.model('candidate', candidateSchema) // 'candidate' this is collection name where store the data in mongoshell:
+module.exports = candidate

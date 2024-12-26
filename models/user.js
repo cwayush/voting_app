@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 
+// Design user SChema: 
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -35,10 +36,11 @@ const userSchema = new mongoose.Schema({
     },
     isVoted: {
         type: Boolean,
-        default: true
+        default: false
     }
 })
 
+// Check if password is Hashed or not if not then hashed the password:
 userSchema.pre('save', async function (next) {
     const user = this;
 
@@ -60,15 +62,17 @@ userSchema.pre('save', async function (next) {
     }
 })
 
-userSchema.method.comparePassword = async function (candidatePassword) {
+// Compare user password for changing password or view profile:
+userSchema.methods.comparePassword = async function (candidatePassword) {
     try {
         // Use bcrypt to compare the provided password with the hashed Password:
         const isMatch = await bcrypt.compare(candidatePassword, this.password)
-        isMatch
+        return isMatch
     } catch (err) {
         throw err;
     }
 }
 
-const User = mongoose.model('user', userSchema)
+// Convert the user Schema into model by mongoose and export the model:
+const User = mongoose.model('user', userSchema)  // 'user' this is collection name where store the data in mongoshell:
 module.exports = User

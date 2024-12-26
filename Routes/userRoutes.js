@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { default: mongoose } = require('mongoose');
 const User = require('./../models/user')
 const { jwtAthMiddle, generationToken } = require('./../jwt')
 
+// Signup the new user data:
 router.post('/signup', async (req, res) => {
     try {
         const data = req.body
@@ -26,14 +26,17 @@ router.post('/signup', async (req, res) => {
     }
 })
 
+// Login the user and generate new token after expiring token:
 router.post('/login', async (req, res) => {
     try {
         const { aadharaCardNumber, password } = req.body;
-        const user = await User.findOne({ aadharaCardNumber, aadharaCardNumber })
-        if (!user || !await User.comparePassword(password)); {
-            res.status(401).josn({ error: "Invalid AadharNumber or Password" });
-
+        const user = await User.findOne({ aadharaCardNumber: aadharaCardNumber })
+        // Compare user aadharCardNumber and his/her password:
+        if (!user || !(await user.comparePassword(password))) {
+            return res.status(401).json({ error: "Invalid AadharNumber or Password" });
         }
+
+        // IF user exist then generate new token:
         const payload = {
             id: User.id
         }
@@ -44,12 +47,14 @@ router.post('/login', async (req, res) => {
         res.status(401).json({ error: 'Internal Server Error!' })
     }
 })
+
+// Get user profile through userID:
 router.get('/profile', jwtAthMiddle, async (req, res) => {
     try {
         const UserData = req.user;
         console.log("userData is:", UserData)
 
-        const userId = userData.id;
+        const userId = UserData.id;
         const user = await User.findById(userId)
         res.status(200).json({ user })
     } catch (err) {
@@ -58,6 +63,7 @@ router.get('/profile', jwtAthMiddle, async (req, res) => {
     }
 })
 
+// Update user password using old_password:
 router.put('/profile/password', jwtAthMiddle, async (req, res) => {
     try {
         const userID = req.user.id
@@ -79,4 +85,5 @@ router.put('/profile/password', jwtAthMiddle, async (req, res) => {
     }
 })
 
+// Export router:
 module.exports = router

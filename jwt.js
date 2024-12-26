@@ -1,5 +1,8 @@
 const jwt = require('jsonwebtoken')
 
+// Export the data like Id and username etc from Token 
+// Check this userID user present or not in collection 
+// If present then print the all details of user:
 const jwtAthMiddle = (req, res, next) => {
     const authorization = req.headers.authorization
     if (!authorization) return res.status(401).json({ error: 'Token NOt Found!' })
@@ -20,6 +23,7 @@ const jwtAthMiddle = (req, res, next) => {
     }
 }
 
+// Generate the token if user is new:
 const generationToken = (userData) => {
     return jwt.sign(userData, process.env.JWT_SECRET)
 }
