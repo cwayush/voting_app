@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router();
 const { defaut, mongoose } = require('mongoose');
-const candidate = require('./../models/candidate')
+const Candidate = require('./../models/candidate')
 const User = require('./../models/user')
 
 const { jwtAthMiddle, generationToken } = require('./../jwt');
@@ -23,7 +23,7 @@ router.post('/', jwtAthMiddle, async (req, res) => {
             return res.status(403).json({ message: 'Admin role not Found!' })
 
         const data = req.body;
-        const newCandidate = new candidate(data);
+        const newCandidate = new Candidate(data);
         const response = await newCandidate.save();
         res.status(200).json({ response: response })
     } catch (err) {
@@ -42,7 +42,7 @@ router.put('/:candidateID', jwtAthMiddle, async (req, res) => {
         const updateCandData = req.body
 
         // Find candidate by candidateID and Updatecandidate data:
-        const response = await candidate.findByIdAndUpdate(candidateID, updateCandData, {
+        const response = await Candidate.findByIdAndUpdate(candidateID, updateCandData, {
             new: true,
             runValidators: true
         })
@@ -67,7 +67,7 @@ router.delete('/:candidateID', jwtAthMiddle, async (req, res) => {
         const candidateID = req.params.id;
 
         // Find Candidate by candidateID and Delete them:
-        const response = await candidate.findByIdAndDelete(candidateID)
+        const response = await Candidate.findByIdAndDelete(candidateID)
         if (!response) {
             res.status(403).json({ error: 'Candidate Not Found' })
         }
@@ -86,8 +86,8 @@ router.post('/vote/:candidateID', jwtAthMiddle, async (req, res) => {
         const userID = req.user.id;
 
         // Find the candidate document with the specified candidate:
-        const Candidate = await candidate.findById(candidateID)
-        if (!Candidate) {
+        const candidate = await Candidate.findById(candidateID)
+        if (!candidate) {
             return res.status(404).json({ error: "Candidate not Found" })
         }
         const user = await User.findById(userID)
@@ -102,9 +102,9 @@ router.post('/vote/:candidateID', jwtAthMiddle, async (req, res) => {
         }
 
         // Update the candidate document to record the vote:
-        Candidate.votes.push({ user: userID })
-        Candidate.voteCount++;
-        await Candidate.save();
+        candidate.votes.push({ user: userID })
+        candidate.voteCount++;
+        await candidate.save();
 
         // Update the user document 
         user.isVoted = true
@@ -121,10 +121,10 @@ router.post('/vote/:candidateID', jwtAthMiddle, async (req, res) => {
 router.get('/vote/count', async (req, res) => {
     try {
         // Find all candidate and sort them by voteCount in descending order:
-        const Candidate = await candidate.find().sort({ voteCount: 'desc' })
+        const candidate = await Candidate.find().sort({ voteCount: 'desc' })
 
         // Map the candidate to only return their name and voteCount:
-        const voteRecord = Candidate.map((data) => {
+        const voteRecord = candidate.map((data) => {
             return {
                 party: data.party,
                 count: data.voteCount
