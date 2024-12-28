@@ -130,13 +130,36 @@ router.get('/vote/count', async (req, res) => {
                 count: data.voteCount
             }
         });
-
         return res.status(200).json(voteRecord)
     } catch (err) {
         console.log(err)
-        res.status(200).json({ error: 'Internal Server error' })
+        res.status(500).json({ error: 'Internal Server error' })
 
     }
+})
+
+// For show the Candidate with his/her party list to user:
+router.get('/candidatelist', async (req, res) => {
+    try {
+        // Find all candidates data:
+        const candidate = await Candidate.find()
+
+        // Map the candidate to only return their name, party and DB_id:
+        const candilist = candidate.map((data) => {
+            return {
+                Cand_party: data.party,
+                Cand_name: data.name,
+                Cand_id: data.id
+            }
+        });
+        return res.status(200).json({ 'Here List of all Candidates with Party name and DB_id': candilist })
+
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({ error: "Internal Server Error!" })
+
+    }
+
 })
 
 // Export router
