@@ -20,15 +20,15 @@ const admincheckrole = async (userID) => {
 router.post('/', jwtAthMiddle, async (req, res) => {
     try {
         if (!await admincheckrole(req.user.id))
-            return res.status(403).json({ message: 'Admin role not Found!' })
+            return res.status(404).json({ message: 'user does not have admin role' })
 
         const data = req.body;
         const newCandidate = new Candidate(data);
         const response = await newCandidate.save();
-        res.status(200).json({ response: response })
+        res.status(201).json({ response: response })
     } catch (err) {
         console.log(err)
-        res.status(401).json({ error: 'Internal Serever Data' })
+        res.status(500).json({ error: 'Internal Serever Data' })
 
     }
 })
@@ -37,7 +37,7 @@ router.post('/', jwtAthMiddle, async (req, res) => {
 router.put('/:candidateID', jwtAthMiddle, async (req, res) => {
     try {
         if (!await admincheckrole(req.user.id))
-            return res.status(403).json({ message: 'user does not have admin role' })
+            return res.status(404).json({ message: 'user does not have admin role' })
         const candidateID = req.params.candidateID;
         const updateCandData = req.body
 
@@ -63,19 +63,19 @@ router.put('/:candidateID', jwtAthMiddle, async (req, res) => {
 router.delete('/:candidateID', jwtAthMiddle, async (req, res) => {
     try {
         if (!await admincheckrole(req.user.id))
-            return res.status(403).json({ message: 'user does not have admin role' })
+            return res.status(404).json({ message: 'user does not have admin role' })
         const candidateID = req.params.id;
 
         // Find Candidate by candidateID and Delete them:
         const response = await Candidate.findByIdAndDelete(candidateID)
         if (!response) {
-            res.status(403).json({ error: 'Candidate Not Found' })
+            res.status(404).json({ error: 'Candidate Not Found' })
         }
         console.log('Candidate Data Deleted')
         res.status(200).json(response)
     } catch (err) {
         console.log(err)
-        res.status(401).json({ error: 'Internal Server error' })
+        res.status(500).json({ error: 'Internal Server error' })
 
     }
 })
@@ -113,7 +113,7 @@ router.post('/vote/:candidateID', jwtAthMiddle, async (req, res) => {
         res.status(200).json({ message: 'Vote recorded successfully' })
     } catch (err) {
         console.log(err)
-        res.status(200).json({ error: 'Internal Server error' })
+        res.status(500).json({ error: 'Internal Server error' })
     }
 })
 

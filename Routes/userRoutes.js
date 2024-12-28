@@ -17,11 +17,11 @@ router.post('/signup', async (req, res) => {
         console.log(JSON.stringify(payload))
         const token = generationToken(payload)
         console.log('Token is:', token)
-        res.status(200).json({ response: response, token: token });
+        res.status(201).json({ response: response, token: token });
 
     } catch (err) {
         console.log(err)
-        res.status(401).json({ error: 'Internal Server Error!' })
+        res.status(500).json({ error: 'Internal Server Error!' })
 
     }
 })
@@ -44,7 +44,7 @@ router.post('/login', async (req, res) => {
         res.json({ token })
     } catch (err) {
         console.log(err)
-        res.status(401).json({ error: 'Internal Server Error!' })
+        res.status(500).json({ error: 'Internal Server Error!' })
     }
 })
 
@@ -59,7 +59,7 @@ router.get('/profile', jwtAthMiddle, async (req, res) => {
         res.status(200).json({ user })
     } catch (err) {
         console.log(err)
-        res.status(401).json({ error: "Internal server error!" })
+        res.status(500).json({ error: "Internal server error!" })
     }
 })
 
@@ -71,7 +71,7 @@ router.put('/profile/password', jwtAthMiddle, async (req, res) => {
 
         const user = User.findById(userID)
         if (!await user.comparePassword(currentPassword)) {
-            res.status(401).json({ error: 'Invalid Password!' })
+            res.status(400).json({ error: 'Invalid Password!' })
         }
         user.password = newPassword
         await user.save();
@@ -81,7 +81,7 @@ router.put('/profile/password', jwtAthMiddle, async (req, res) => {
 
     } catch (err) {
         console.log(err)
-        req.status(401).json({ error: 'Internal server Error' })
+        req.status(500).json({ error: 'Internal server Error' })
     }
 })
 
